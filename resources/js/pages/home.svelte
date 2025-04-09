@@ -2,27 +2,22 @@
     import { Link } from "@inertiajs/svelte";
     import axios from "axios";
 
-    let list = $state([
-        {
-            name: "John Doe",
-            age: 30,
-        },
-        {
-            name: "Jane Smith",
-            age: 25,
-            greeting: async () => {
-                try {
-                    const res = await axios.get(route("bar"));
-                    console.log(res.data);
-                } catch (e) {
-                    console.error(e);
-                }
-            },
-        },
-    ]);
+    let { list } = $props();
+    let _list = $state(list);
+
+    const init = () => {
+        for (const item of _list) {
+            item.actions = {};
+            item.actions.greeting = (name) => {
+                console.log(`Hello ${name}, I am ${item.name}`);
+            };
+        }
+    };
+
+    init();
 </script>
 
-{#each list as item}
+{#each _list as item}
     <div>
         <h2>{item.name}</h2>
         <p>Age: {item.age}</p>
@@ -31,4 +26,4 @@
 
 <Link href={route("foo")}>To foo</Link>
 <br />
-<button onclick={() => list[1].greeting()}>Greet Jane</button>
+<button onclick={() => _list[1].actions.greeting("sam")}>Greet Jane</button>
